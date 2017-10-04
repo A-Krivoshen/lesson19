@@ -1,0 +1,127 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport"
+              content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" href="web/style/index.css">
+        <title>Task manager</title>
+    </head>
+    <body>
+
+    <div id="wrapper">
+        <a class="logout" href="../">&larr; Выйти</a>
+
+        <div class="tasks">
+            {% if quantityOfUserTasks == 0 %}
+                <p class="smile">&#9785;</p>
+                <p class="tasksNotExist">{{ sessionUser }}, вы пока не добавили ни одной задачи</p>
+            {% else %}
+                <form method="POST" class="sortForm">
+                    <div>
+                        <label>
+                            Сортировать по:
+                            <select name="sortBy" id="sortBy">
+                                <option value="date">Дате добавления</option>
+                                <option value="status">Статусу</option>
+                                <option value="description">Описанию</option>
+                            </select>
+                        </label>
+                        <input type="submit" name="sort" id="sort" value="Сортировка">
+                    </div>
+                    <h2 class="nickname">{{ sessionUser }}, это задачи, созданные вами</h2>
+                </form>
+
+                <table class="tasksOfUser">
+                    <tr>
+                        <td>Задача</td>
+                        <td>Автор</td>
+                        <td>Исполнитель</td>
+                        <td>Статус</td>
+                        <td>Дата добавления</td>
+                        <td>Действия</td>
+                    </tr>
+                    {% for task in tasksOfUser %}
+                        <tr>
+                            <td>{{ task.description }}</td>
+                            <td>Вы</td>
+                            <td>{{ task.assigned_user_login == sessionUser ? 'Вы' : task.assigned_user_login }}</td>
+                            <td style="color: {{ task.is_done ? 'green' : 'orange' }}">
+                                {{ task.is_done ? 'Выполнено' : 'В процессе' }}
+                            </td>
+                            <td>{{ task.date_added }}</td>
+                            <td>
+                                <p class='edit link'>Изменить &#9998;</p>
+                                <p class='is_done_changer link'>{{ task.is_done != 1 ? 'Выполнить &#10004;' :  'Не выполнить X' }}</p>
+                                <p class='delete link'>Удалить &cross;</p>
+                                <form method="POST" class="changeAssignedUser">
+                                    <label>
+                                        <input type="submit" value="Сменить исполнителя" name="changeAssignedUser">
+                                        <select name="assignedUser">
+                                            {% for user in users %}
+                                                <option value="{{ user.id }}">{{ user.login }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </label>
+                                </form>
+                                <input type="hidden" value="{{ task.id }}">
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+        </div>
+
+        <div class="tasksForYou">
+            {% if quantityForUserTasks == 0 %}
+                <p class="smile">&#9785;</p>
+                <p class="tasksNotExist">{{ sessionUser }}, для вас пока не добавили ни одной задачи</p>
+            {% else %}
+                <h2>А это задачи, созданные другими пользователями для вас:</h2>
+                <table class="tasksForUser">
+                    <tr>
+                        <td>Задача</td>
+                        <td>Автор</td>
+                        <td>Исполнитель</td>
+                        <td>Статус</td>
+                        <td>Дата добавления</td>
+                        <td>Действия</td>
+                    </tr>
+                    {% for theTask in tasksForUser %}
+                        <tr>
+                            <td>{{ theTask.description }}</td>
+                            <td>{{ theTask.user_login }}</td>
+                            <td>Вы</td>
+                            <td style="color: {{ theTask.is_done ? 'green' : 'orange' }}">
+                                {{ theTask.is_done ? 'Выполнено' : 'В процессе' }}
+                            </td>
+                            <td>{{ theTask.date_added }}</td>
+                            <td>
+                                <p class='edit link'>Изменить &#9998;</p>
+                                <p class='is_done_changer link'>{{ task.is_done ? 'Не выполнить X' : 'Выполнить &#10004;' }}</p>
+                                <p class='delete link'>Удалить &cross;</p>
+                                <input type="hidden" value="{{ theTask.id }}">
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+        </div>
+
+        <div class="forms">
+            <form method="POST" class="addTaskForm">
+                <textarea name="task" placeholder="Задача" id="task" cols="50" rows="3" required></textarea>
+                <input type="submit" name="addTask" value="Добавить задачу" class="button">
+            </form>
+        </div>
+
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="http://code.jquery.com/color/jquery.color-2.1.2.min.js"></script>
+    <script src="web/js/index.js"></script>
+
+    </body>
+    </html>
